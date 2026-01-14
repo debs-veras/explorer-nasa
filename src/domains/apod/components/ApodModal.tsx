@@ -1,4 +1,3 @@
-
 import { X, Calendar, Star, ExternalLink, Video, Info } from "lucide-react";
 import { useState, useEffect } from "react";
 import type { Apod } from "../types";
@@ -186,47 +185,6 @@ export function ApodModal({ item, onClose }: Props) {
           </div>
         </div>
       </div>
-
-      {/* Scrollbar */}
-      <style>
-        {`
-          /* Remove setas */
-          *::-webkit-scrollbar-button {
-            display: none;
-            width: 0;
-            height: 0;
-          }
-
-          *::-webkit-scrollbar {
-            width: 6px;
-          }
-
-          *::-webkit-scrollbar-track {
-            background: transparent;
-          }
-
-          *::-webkit-scrollbar-thumb {
-            background: linear-gradient(
-              180deg,
-              rgba(56,189,248,0.9),
-              rgba(37,99,235,0.9)
-            );
-            border-radius: 999px;
-            box-shadow:
-              0 0 8px rgba(56,189,248,0.5),
-              inset 0 0 6px rgba(255,255,255,0.15);
-          }
-
-          *::-webkit-scrollbar-thumb:hover {
-            background: linear-gradient(
-              180deg,
-              rgba(125,211,252,1),
-              rgba(59,130,246,1)
-            );
-            box-shadow: 0 0 14px rgba(125,211,252,0.8);
-          }
-        `}
-      </style>
     </div>
   );
 }
