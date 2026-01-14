@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo } from "react";
 import { motion, type Variants } from "framer-motion";
 import { ArrowRight, Sparkles } from "lucide-react";
 
@@ -39,18 +39,6 @@ const item: Variants = {
 
 export default function Hero() {
   const stars = useMemo(() => generateStars(160), []);
-  const [offset, setOffset] = useState({ x: 0, y: 0 });
-
-  /* Parallax refinado */
-  useEffect(() => {
-    const move = (e: MouseEvent) => {
-      const x = (e.clientX / window.innerWidth - 0.5) * 12;
-      const y = (e.clientY / window.innerHeight - 0.5) * 12;
-      setOffset({ x, y });
-    };
-    window.addEventListener("mousemove", move);
-    return () => window.removeEventListener("mousemove", move);
-  }, []);
 
   return (
     <section className="relative min-h-screen bg-black overflow-hidden">
@@ -152,9 +140,6 @@ export default function Hero() {
             initial={{ opacity: 0, scale: 0.85, filter: "blur(12px)" }}
             animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
             transition={{ duration: 1.2, ease: "easeOut" }}
-            style={{
-              transform: `translate(${offset.x}px, ${offset.y}px)`,
-            }}
           >
             <motion.img
               src="https://upload.wikimedia.org/wikipedia/commons/e/e5/NASA_logo.svg"
