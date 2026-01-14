@@ -104,7 +104,7 @@ export default function Hero() {
             <div className="flex items-center gap-2">
               <Sparkles className="w-5 h-5 text-cyan-400 animate-spin-slow" />
               <span className="text-sm uppercase tracking-widest text-cyan-400 font-mono">
-                NASA Cosmic Explorer
+                Explorer NASA
               </span>
             </div>
             <div className="h-px flex-1 bg-linear-to-r from-cyan-500/50 to-transparent" />

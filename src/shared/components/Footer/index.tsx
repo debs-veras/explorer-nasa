@@ -10,7 +10,7 @@ export default function Footer() {
               <Rocket className="w-5 h-5 text-cyan-300" />
             </div>
             <div className="space-y-1">
-              <p className="text-cyan-100">NASA Cosmic Explorer</p>
+              <p className="text-cyan-100">Explorer NASA</p>
               <p className="text-cyan-100/50 text-xs">
                 Projeto de código aberto • APOD API v1.0
               </p>
