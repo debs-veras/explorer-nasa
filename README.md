@@ -1,6 +1,6 @@
-# 🚀 Explore NASA
+# 🚀 Explorer NASA
 
-Explore NASA é uma aplicação frontend desenvolvida em **React + TypeScript** que consome a **NASA Open API (APOD – Astronomy Picture of the Day)** para exibir uma galeria de imagens e vídeos astronômicos. O projeto foi construído com foco em **arquitetura escalável**, **performance**, **boas práticas de engenharia frontend** e organização de código orientada a domínio.
+Explorer NASA é uma aplicação frontend desenvolvida em **React + TypeScript** que consome a **NASA Open API (APOD – Astronomy Picture of the Day)** para exibir uma galeria de imagens e vídeos astronômicos. O projeto foi construído com foco em **arquitetura escalável**, **performance**, **boas práticas de engenharia frontend** e organização de código orientada a domínio.
 
 Este projeto também serve como **case de portfólio profissional**.
 
