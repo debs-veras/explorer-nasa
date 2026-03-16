@@ -1,6 +1,6 @@
 import { AlertCircle } from "lucide-react";
 
-export default function ErrorSection() {
+export default function ErrorSection({ message }: { message: string }) {
   return (
     <div className="glass-cosmic p-8 rounded-3xl border border-red-500/20 shadow-2xl shadow-red-500/10 animate-shake">
       <div className="flex items-center gap-6">
@@ -20,9 +20,7 @@ export default function ErrorSection() {
           <div className="space-y-2 pt-2">
             <p className="text-sm text-red-200/60">Possíveis causas:</p>
             <ul className="text-sm text-red-200/60 space-y-1 list-disc list-inside">
-              <li>Tempestade solar interferindo nas comunicações</li>
-              <li>Satélites fora do alcance orbital</li>
-              <li>Manutenção programada na APOD API</li>
+              <li>{message}</li>
             </ul>
           </div>
         </div>

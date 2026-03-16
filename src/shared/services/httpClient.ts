@@ -7,3 +7,11 @@ export const httpClient = axios.create({
     api_key: import.meta.env.VITE_NASA_API_KEY,
   },
 });
+
+httpClient.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.data?.msg) error.message = error.response.data.msg;
+    return Promise.reject(error);
+  },
+);
