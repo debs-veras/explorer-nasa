@@ -1,19 +1,49 @@
-import { X, Calendar, Star, ExternalLink, Video, Info } from "lucide-react";
-import { useState, useEffect } from "react";
-import type { Apod } from "../types";
+import { OptimizedImage } from "../../../shared/components/OptimizedImage/index";
+import { X, Calendar, Star, ExternalLink, Video, Info, ChevronLeft, ChevronRight, ZoomIn, ZoomOut, RotateCcw } from "lucide-react";
+import { useEffect, useState, useCallback, useRef } from "react";
+import { motion, AnimatePresence, useMotionValue } from "framer-motion";
+import type { Apod } from "../../../shared/types/types";
 
-type Props = { item: Apod; onClose: () => void };
+type Props = { items: Apod[]; initialIndex: number; onClose: () => void };
 
-export function ApodModal({ item, onClose }: Props) {
-  const [imageLoading, setImageLoading] = useState(true);
+export function ApodModal({ items, initialIndex, onClose }: Props) {
+  const [currentIndex, setCurrentIndex] = useState(initialIndex);
+  const [scale, setScale] = useState(1);
+  const containerRef = useRef<HTMLDivElement>(null);
+  
+  const x = useMotionValue(0);
+  const y = useMotionValue(0);
+
+  const item = items[currentIndex];
+  
   const isVideo = item.media_type === "video";
   const imageUrl = item.hdurl ?? item.url;
 
+  const resetPosition = useCallback(() => {
+    setScale(1);
+    x.set(0);
+    y.set(0);
+  }, [x, y]);
+
+  const handleNext = useCallback(() => {
+    setCurrentIndex((prev) => (prev + 1) % items.length);
+    resetPosition();
+  }, [items.length, resetPosition]);
+
+  const handlePrev = useCallback(() => {
+    setCurrentIndex((prev) => (prev - 1 + items.length) % items.length);
+    resetPosition();
+  }, [items.length, resetPosition]);
+
   useEffect(() => {
-    const handleEsc = (e: KeyboardEvent) => e.key === "Escape" && onClose();
-    window.addEventListener("keydown", handleEsc);
-    return () => window.removeEventListener("keydown", handleEsc);
-  }, [onClose]);
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+      if (e.key === "ArrowRight") handleNext();
+      if (e.key === "ArrowLeft") handlePrev();
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [onClose, handleNext, handlePrev]);
 
   useEffect(() => {
     document.body.style.overflow = "hidden";
@@ -22,6 +52,39 @@ export function ApodModal({ item, onClose }: Props) {
     };
   }, []);
 
+  const handleZoomIn = () => setScale((prev) => Math.min(prev + 0.5, 4));
+  const handleZoomOut = () => {
+    setScale((prev) => {
+      const newScale = Math.max(prev - 0.5, 1);
+      if (newScale === 1) {
+        x.set(0);
+        y.set(0);
+      }
+      return newScale;
+    });
+  };
+  const handleResetZoom = () => resetPosition();
+  
+  const [dragConstraints, setDragConstraints] = useState({ left: 0, right: 0, top: 0, bottom: 0 });
+
+  useEffect(() => {
+    const updateConstraints = () => {
+      if (containerRef.current) {
+        const { offsetWidth, offsetHeight } = containerRef.current;
+        setDragConstraints({
+          left: -((scale - 1) * offsetWidth) / 2,
+          right: ((scale - 1) * offsetWidth) / 2,
+          top: -((scale - 1) * offsetHeight) / 2,
+          bottom: ((scale - 1) * offsetHeight) / 2,
+        });
+      }
+    };
+
+    updateConstraints();
+    window.addEventListener("resize", updateConstraints);
+    return () => window.removeEventListener("resize", updateConstraints);
+  }, [scale, item.date]);
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4">
       {/* Overlay */}
@@ -29,6 +92,23 @@ export function ApodModal({ item, onClose }: Props) {
         className="absolute inset-0 bg-linear-to-br from-black via-gray-900/95 to-black backdrop-blur-xl"
         onClick={onClose}
       />
+
+      {/* Navigation Buttons - Desktop */}
+      <button
+        onClick={handlePrev}
+        className="hidden lg:flex absolute left-8 z-50 p-4 bg-white/5 hover:bg-white/10 border border-white/10 rounded-full transition-all hover:scale-110 group active:scale-95"
+        aria-label="Imagem anterior"
+      >
+        <ChevronLeft className="w-8 h-8 text-white group-hover:text-cyan-400 transition-colors" />
+      </button>
+
+      <button
+        onClick={handleNext}
+        className="hidden lg:flex absolute right-8 z-50 p-4 bg-white/5 hover:bg-white/10 border border-white/10 rounded-full transition-all hover:scale-110 group active:scale-95"
+        aria-label="Próxima imagem"
+      >
+        <ChevronRight className="w-8 h-8 text-white group-hover:text-cyan-400 transition-colors" />
+      </button>
 
       {/* Modal */}
       <div
@@ -50,38 +130,77 @@ export function ApodModal({ item, onClose }: Props) {
         </button>
 
         {/* Media */}
-        <div className="relative w-full lg:w-1/2 overflow-hidden shrink-0">
-          {imageLoading && !isVideo && (
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div className="w-14 h-14 border-4 border-transparent border-t-cyan-400 border-r-blue-400 rounded-full animate-spin" />
-            </div>
-          )}
-
-          {isVideo ? (
-            <div className="relative w-full h-0 pb-[56.25%] bg-black">
-              <iframe
-                src={item.url}
-                className="absolute inset-0 w-full h-full"
-                title={item.title}
-                allowFullScreen
-              />
-            </div>
-          ) : (
-            <>
-              <img
-                src={imageUrl}
-                alt={item.title}
-                className={`w-full h-full object-cover transition-opacity duration-500 ${
-                  imageLoading ? "opacity-0" : "opacity-100"
-                }`}
-                onLoad={() => setImageLoading(false)}
-              />
-              <div className="absolute inset-0 bg-linear-to-t from-black/80 via-transparent to-transparent" />
-            </>
-          )}
+        <div className="relative w-full lg:w-1/2 overflow-hidden shrink-0 bg-black flex items-center justify-center">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={item.date}
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              transition={{ duration: 0.3 }}
+              className="w-full h-full relative"
+            >
+              {isVideo ? (
+                <div className="relative w-full h-0 pb-[56.25%] bg-black self-center">
+                  <iframe
+                    src={item.url}
+                    className="absolute inset-0 w-full h-full"
+                    title={item.title}
+                    allowFullScreen
+                  />
+                </div>
+              ) : (
+                <div 
+                  ref={containerRef}
+                  className="relative w-full h-full overflow-hidden flex items-center justify-center"
+                >
+                  <motion.div
+                    drag={scale > 1}
+                    dragConstraints={dragConstraints}
+                    dragElastic={0.1}
+                    animate={{ scale }}
+                    style={{ x, y }}
+                    className="w-full h-full cursor-grab active:cursor-grabbing"
+                  >
+                    <OptimizedImage
+                      src={imageUrl}
+                      alt={item.title}
+                      aspectRatio="aspect-square lg:aspect-auto lg:h-full"
+                      className="w-full h-full object-contain pointer-events-none"
+                    />
+                  </motion.div>
+                  
+                  {/* Zoom Controls */}
+                  <div className="absolute bottom-6 right-6 flex flex-col gap-2 z-20">
+                    <button 
+                      onClick={handleZoomIn}
+                      className="p-2 bg-black/50 backdrop-blur-md border border-white/10 rounded-lg text-white hover:bg-white/10 transition"
+                      title="Aumentar zoom"
+                    >
+                      <ZoomIn className="w-5 h-5" />
+                    </button>
+                    <button 
+                      onClick={handleZoomOut}
+                      className="p-2 bg-black/50 backdrop-blur-md border border-white/10 rounded-lg text-white hover:bg-white/10 transition"
+                      title="Diminuir zoom"
+                    >
+                      <ZoomOut className="w-5 h-5" />
+                    </button>
+                    <button 
+                      onClick={handleResetZoom}
+                      className="p-2 bg-black/50 backdrop-blur-md border border-white/10 rounded-lg text-white hover:bg-white/10 transition"
+                      title="Resetar zoom"
+                    >
+                      <RotateCcw className="w-5 h-5" />
+                    </button>
+                  </div>
+                </div>
+              )}
+            </motion.div>
+          </AnimatePresence>
 
           {/* Badges */}
-          <div className="absolute bottom-4 left-4 flex flex-wrap gap-2">
+          <div className="absolute bottom-4 left-4 flex flex-wrap gap-2 z-20">
             <div className="px-3 py-1.5 bg-black/70 backdrop-blur-sm rounded-full border border-white/10 flex items-center gap-2">
               {isVideo ? (
                 <Video className="w-4 h-4 text-purple-400" />
@@ -97,13 +216,29 @@ export function ApodModal({ item, onClose }: Props) {
               </span>
             </div>
             {item.copyright && (
-              <div className="px-3 py-1.5 bg-black/70 backdrop-blur-sm rounded-full border border-white/10 flex items-center gap-2">
+              <div className="hidden sm:flex px-3 py-1.5 bg-black/70 backdrop-blur-sm rounded-full border border-white/10 items-center gap-2">
                 <Star className="w-4 h-4 text-yellow-400" />
                 <span className="text-xs font-medium text-white">
                   © {item.copyright}
                 </span>
               </div>
             )}
+          </div>
+
+          {/* Mobile Navigation */}
+          <div className="lg:hidden absolute inset-y-0 inset-x-0 flex items-center justify-between px-4 pointer-events-none">
+            <button
+              onClick={handlePrev}
+              className="p-3 bg-black/50 backdrop-blur border border-white/10 rounded-full text-white pointer-events-auto active:scale-95 transition"
+            >
+              <ChevronLeft className="w-6 h-6" />
+            </button>
+            <button
+              onClick={handleNext}
+              className="p-3 bg-black/50 backdrop-blur border border-white/10 rounded-full text-white pointer-events-auto active:scale-95 transition"
+            >
+              <ChevronRight className="w-6 h-6" />
+            </button>
           </div>
         </div>
 

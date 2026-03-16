@@ -6,12 +6,15 @@ import ErrorSection from "../../../../shared/components/ErrorSection";
 import { Calendar } from "lucide-react";
 import { DateFilter } from "../../components/DateFilter";
 import { ApodGallery } from "../../components/ApodGallery";
-import type { Apod } from "../../types";
 
 export default function ApodGalleryPage() {
-  const [startDate, setStartDate] = useState("2024-01-01");
-  const [endDate, setEndDate] = useState("2024-01-10");
-  const [selected, setSelected] = useState<Apod | null>(null);
+  const [startDate, setStartDate] = useState(() => {
+    const d = new Date();
+    d.setDate(d.getDate() - 10);
+    return d.toISOString().split("T")[0];
+  });
+  const [endDate, setEndDate] = useState(() => new Date().toISOString().split("T")[0]);
+  const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
 
   const { data, isLoading, error } = useApodGallery(startDate, endDate);
   return (
@@ -52,12 +55,22 @@ export default function ApodGalleryPage() {
                 }}
               />
             </section>
-            <ApodGallery items={data} onSelect={setSelected} />
+            <ApodGallery 
+              items={data} 
+              onSelect={(item) => {
+                const index = data.findIndex(i => i.date === item.date);
+                setSelectedIndex(index);
+              }} 
+            />
           </section>
         )}
       </div>
-      {selected && (
-        <ApodModal item={selected} onClose={() => setSelected(null)} />
+      {selectedIndex !== null && data && (
+        <ApodModal 
+          items={data} 
+          initialIndex={selectedIndex} 
+          onClose={() => setSelectedIndex(null)} 
+        />
       )}
     </>
   );

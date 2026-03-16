@@ -1,4 +1,5 @@
-import type { Apod } from "../types";
+import { OptimizedImage } from "../../../shared/components/OptimizedImage/index";
+import type { Apod } from "../../../shared/types/types";
 
 interface ApodGalleryProps {
   items: Apod[];
@@ -27,10 +28,10 @@ export function ApodGallery({ items, onSelect }: ApodGalleryProps) {
 
             {/* Imagem ou vídeo */}
             {item.media_type === "image" ? (
-              <img
+              <OptimizedImage
                 src={item.url}
                 alt={item.title}
-                className="w-full h-64 object-cover rounded-t-3xl"
+                className="rounded-t-3xl"
               />
             ) : (
               <iframe

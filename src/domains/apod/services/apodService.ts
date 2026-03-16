@@ -1,5 +1,5 @@
 import { httpClient } from "../../../shared/services/httpClient";
-import type { GetApodParamsReq } from "../types";
+import type { GetApodParamsReq } from "../../../shared/types/types";
 
 export async function getApod(params: GetApodParamsReq) {
   const { data } = await httpClient.get("/planetary/apod", {

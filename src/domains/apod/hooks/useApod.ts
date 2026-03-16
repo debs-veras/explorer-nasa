@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { getApod } from "../services/apodService";
-import type { Apod } from "../types";
+import type { Apod } from "../../../shared/types/types";
 
 export function useApodGallery(startDate: string, endDate: string) {
   return useQuery<Apod[]>({
