@@ -54,7 +54,7 @@ export default function ApodGalleryPage() {
           </section>
 
           <ApodGallery
-            items={[]}
+            items={data ?? []}
             error={error}
             isLoading={isLoading}
             onSelect={(item) => {
