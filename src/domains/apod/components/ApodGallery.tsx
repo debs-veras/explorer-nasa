@@ -4,7 +4,10 @@ import Loading from "../../../shared/components/Loading";
 import { OptimizedImage } from "../../../shared/components/OptimizedImage/index";
 import type { Apod } from "../../../shared/types/types";
 
+import { formatDateBR } from "../../../shared/utils/date";
+
 interface ApodGalleryProps {
+
   items: Apod[];
   onSelect: (item: Apod) => void;
   isLoading: boolean;
@@ -63,7 +66,7 @@ export function ApodGallery({
                   <h3 className="font-bold text-lg text-cyan-300">
                     {item.title}
                   </h3>
-                  <p className="text-sm text-gray-400">{item.date}</p>
+                  <p className="text-sm text-gray-400">{formatDateBR(item.date)}</p>
                   <p className="text-sm text-gray-200 line-clamp-3">
                     {item.explanation}
                   </p>

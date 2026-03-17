@@ -3,6 +3,8 @@ import { X, Calendar, Star, ExternalLink, Video, Info, ChevronLeft, ChevronRight
 import { useEffect, useState, useCallback, useRef } from "react";
 import { motion, AnimatePresence, useMotionValue } from "framer-motion";
 import type { Apod } from "../../../shared/types/types";
+import { formatDateBR, formatDateFullBR } from "../../../shared/utils/date";
+
 
 type Props = { items: Apod[]; initialIndex: number; onClose: () => void };
 
@@ -247,12 +249,7 @@ export function ApodModal({ items, initialIndex, onClose }: Props) {
           <div className="space-y-2">
             <div className="flex items-center gap-2 text-sm text-zinc-400">
               <Calendar className="w-4 h-4" />
-              {new Date(item.date).toLocaleDateString("pt-BR", {
-                weekday: "long",
-                year: "numeric",
-                month: "long",
-                day: "numeric",
-              })}
+              {formatDateFullBR(item.date)}
             </div>
 
             <h2 className="text-2xl lg:text-3xl font-bold bg-linear-to-r from-cyan-300 to-blue-300 bg-clip-text text-transparent">
@@ -302,7 +299,7 @@ export function ApodModal({ items, initialIndex, onClose }: Props) {
             <div>
               <p className="text-zinc-500">Data de Publicação</p>
               <p className="font-medium text-white">
-                {new Date(item.date).toLocaleDateString()}
+                {formatDateBR(item.date)}
               </p>
             </div>
             <div>
